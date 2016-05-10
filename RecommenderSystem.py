@@ -1,10 +1,19 @@
 import numpy as np
 import pandas as pd
-import json
+import theano
+import csv
+
+movieID_filename = "/Users/dannyg/Desktop/Projects/Datasets/NetflixMovies/movie_titles.csv"
+testset_filename = "/Users/dannyg/Desktop/Projects/Datasets/NetflixMovies/probe.csv"
+customerID_filename = "/Users/dannyg/Desktop/Projects/Datasets/NetflixMovies/qualifying.csv"
+
+movie_dataset = pd.read_csv(movieID_filename, sep=',')
+customer_dataset = pd.read_csv(customerID_filename, sep=',')
 
 
-json_dataset = "" #need to download dataset
 
-with open(json_dataset, 'r') as f:
-    data = json.load(f)
+
+
+
+
 
