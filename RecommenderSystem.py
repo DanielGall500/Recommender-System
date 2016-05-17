@@ -3,9 +3,11 @@ import pandas as pd
 import theano
 import csv
 
-dataset_file = "C:\Users\dano\Dropbox\Datasets\ml-100k\u.csv"
+rating_file = "C:\Users\dano\Dropbox\Datasets\ml-100k\u.csv"
+movieinfo_file = "C:\Users\dano\Dropbox\Datasets\ml-100k\u_item.csv"
 
-data = pd.read_csv(dataset_file, sep='	')
+ratings_data = pd.read_csv(rating_file, sep='	')
+movies_data = pd.read_csv(movieinfo_file, sep='|')
 
 from sklearn.cluster import KMeans
 
