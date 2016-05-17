@@ -3,12 +3,17 @@ import pandas as pd
 import theano
 import csv
 
-movieID_filename = "/Users/dannyg/Desktop/Projects/Datasets/NetflixMovies/movie_titles.csv"
-testset_filename = "/Users/dannyg/Desktop/Projects/Datasets/NetflixMovies/probe.csv"
-customerID_filename = "/Users/dannyg/Desktop/Projects/Datasets/NetflixMovies/qualifying.csv"
+dataset_file = "C:\Users\dano\Dropbox\Datasets\ml-100k\u.csv"
 
-movie_dataset = pd.read_csv(movieID_filename, sep=',')
-customer_dataset = pd.read_csv(customerID_filename, sep=',')
+data = pd.read_csv(dataset_file, sep='	')
+
+from sklearn.cluster import KMeans
+
+clstr = KMeans(n_clusters=(12), max_iter=300, random_state=42)
+
+clstr.fit(data)
+
+
 
 
 
