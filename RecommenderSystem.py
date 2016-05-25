@@ -7,13 +7,18 @@ rating_file = "C:\Users\dano\Dropbox\Datasets\ml-100k\u.csv"
 movieinfo_file = "C:\Users\dano\Dropbox\Datasets\ml-100k\u_item.csv"
 
 ratings_data = pd.read_csv(rating_file, sep='	')
-movies_data = pd.read_csv(movieinfo_file, sep='|')
+movies_data = pd.read_csv(movieinfo_file, sep='\t')
+
+mov_categories = ['Adventure', 'Animation', 'Children', 'Comedy', 'Crime','Documentary',
+                  'Drama', 'Fantasy', 'Film-Noir', 'Horror', 'Musical',
+                  'Mystery', 'Romance', 'Sci-Fi', 'Thriller', 'War', 'Western']
 
 rating_samples, rating_features = ratings_data.shape
 movie_samples, movie_features = movies_data.shape
 
+num_categories = 17
 
-def ratings_set(users, movies):
+def ratings_set(users):
     user_info = {}
 
     for idx, user in users.iterrows():
@@ -25,12 +30,38 @@ def ratings_set(users, movies):
             user_info[user_id].append([movie_id, rating])
         else:
             user_info[user_id] = [[movie_id, rating]]
-            print("New user added: {}".format(user_id))
 
     return user_info
 
-user_ratings = ratings_set(ratings_data, movies_data)
+user_ratings = ratings_set(ratings_data)
 
+def preference_set(usr_ratings, movies):
+    user_prefs = {}
+    for user, ratings in usr_ratings.iteritems():
+        user_prefs[user] = np.zeros((num_categories))
+
+        for rating in ratings:
+            mov_id = int(rating[0]) - 1 #check
+            rate = rating[1]
+
+            title = movies.iloc[mov_id][1]
+            categories = movies.iloc[mov_id][4:]
+
+            try:
+                categ_prefs = [float(x) for x in categories.values]
+                print categ_prefs
+                print user_prefs[user]
+            except ValueError:
+                print "VALUERROR", title
+                continue
+
+
+
+
+
+
+
+preference_set(user_ratings, movies_data)
 
 
 """
