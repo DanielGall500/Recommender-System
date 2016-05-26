@@ -16,7 +16,7 @@ mov_categories = ['Adventure', 'Animation', 'Children', 'Comedy', 'Crime','Docum
 rating_samples, rating_features = ratings_data.shape
 movie_samples, movie_features = movies_data.shape
 
-num_categories = 17
+num_categories = 16
 
 def ratings_set(users):
     user_info = {}
@@ -33,12 +33,10 @@ def ratings_set(users):
 
     return user_info
 
-user_ratings = ratings_set(ratings_data)
-
 def preference_set(usr_ratings, movies):
     user_prefs = {}
     for user, ratings in usr_ratings.iteritems():
-        user_prefs[user] = np.zeros((num_categories))
+        user_prefs[user] = np.zeros(16)
 
         for rating in ratings:
             mov_id = int(rating[0]) - 1 #check
@@ -49,19 +47,20 @@ def preference_set(usr_ratings, movies):
 
             try:
                 categ_prefs = [float(x) for x in categories.values]
-                print categ_prefs
-                print user_prefs[user]
             except ValueError:
-                print "VALUERROR", title
                 continue
 
+            if rate > 3:
+                user_prefs[user] += categ_prefs
+            else:
+                user_prefs[user] -= categ_prefs
+
+    return user_prefs
 
 
+user_ratings = ratings_set(ratings_data)
 
-
-
-
-preference_set(user_ratings, movies_data)
+user_prefs = preference_set(user_ratings, movies_data)
 
 
 """
