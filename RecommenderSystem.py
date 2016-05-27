@@ -2,6 +2,8 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import csv
+import collections
+import operator
 
 rating_file = "C:\Users\dano\Dropbox\Datasets\ml-100k\u.csv"
 movieinfo_file = "C:\Users\dano\Dropbox\Datasets\ml-100k\u_item.csv"
@@ -57,10 +59,37 @@ def preference_set(usr_ratings, movies):
 
     return user_prefs
 
+def find_similar(target_prefs, prefs_collection):
+    user_similarity = {}
+
+    for u_id, u_prefs in prefs_collection.iteritems():
+        similarity = np.sqrt(np.abs(sum(u_prefs - target_prefs)))  #how similar are user x and the target user?
+        user_similarity[u_id] = np.round(similarity, 5)
+
+    ordered_dict = sorted(user_similarity.items(), key=operator.itemgetter(1))
+
+    return ordered_dict
+
+def find_recommendations(sim_users, target_user):
+    recommendations = {}
+
+    #for u_id, similarity in sim_users:
+    #    highly_rated = [x['item_id'] for x in ratings_data[ratings_data['user_id'] == u_id] if x['rating'] >= 4]
+    #return highly_rated
+
 
 user_ratings = ratings_set(ratings_data)
 
 user_prefs = preference_set(user_ratings, movies_data)
+
+target_prefs = np.array(([ -7.,  -8., -41.,  -4.,  -8.,  -1.,   0.,  -3., -12.,  -7.,  -1.,
+       -11., -12., -13.,   0.,  -3.]))
+
+similar_users = find_similar(target_prefs, user_prefs)
+
+recommended_movies = find_recommendations(similar_users, target_prefs)
+
+print recommended_movies
 
 
 """
