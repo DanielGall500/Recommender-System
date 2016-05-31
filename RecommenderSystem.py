@@ -89,12 +89,19 @@ def find_recommendations(sim_users, target_user):
                 rcmnd[idx] = [movie[1]]
     return rcmnd
 
+def target_info(user_id):
+    rated_movies = [x[1] for x in ratings_data[ratings_data['user_id'] == user_id].iterrows()]
+    return rated_movies
+
 #user_ratings = ratings_set(ratings_data)
 
 #user_prefs = preference_set(user_ratings, movies_data)
 
 target_prefs = np.array(([ -7.,  -8., -41.,  -4.,  -8.,  -1.,   0.,  -3., -12.,  -7.,  -1.,
        -11., -12., -13.,   0.,  -3.]))
+
+target_movies = target_info(933)
+print target_movies
 
 #similar_users = find_similar(target_prefs, user_prefs)
 
