@@ -72,8 +72,9 @@ def find_similar(target_prefs, prefs_collection): #finds the similarity between 
 
     return ordered_dict[:cut_off]
 
-def find_recommendations(sim_users, target_user):
+def find_recommendations(sim_users, target_user, watched_movies):
     rcmnd = {}
+    rcmnd_count = {}
 
     for idx, users in enumerate(sim_users): #sim_users already in order so index will tell us whos the most similar
         u_id = users[0]
@@ -87,10 +88,27 @@ def find_recommendations(sim_users, target_user):
                 rcmnd[idx].append(movie[1])
             else:
                 rcmnd[idx] = [movie[1]]
-    return rcmnd
+
+    for idx, recomm in rcmnd.iteritems():
+        for r in recomm:
+            if r in rcmnd_count:
+                rcmnd_count[r] += 1
+            else:
+                rcmnd_count[r] = 1
+
+    #filtering movies that the user has already seen
+    for mov_id, votes in rcmnd_count.iteritems():
+        if mov_id in watched_movies:
+            rcmnd_count[mov_id] = 0
+
+    #a list of the movies with the most recommendations
+    highly_recommended = [x for x in sorted(rcmnd_count.items(), \
+                   key=operator.itemgetter(1))[::-1] if x[1] != 0]
+
+    return highly_recommended
 
 def target_info(user_id):
-    rated_movies = [x[1] for x in ratings_data[ratings_data['user_id'] == user_id].iterrows()]
+    rated_movies = [x for x in ratings_data[ratings_data['user_id'] == user_id]['item_id']]
     return rated_movies
 
 #user_ratings = ratings_set(ratings_data)
@@ -100,8 +118,8 @@ def target_info(user_id):
 target_prefs = np.array(([ -7.,  -8., -41.,  -4.,  -8.,  -1.,   0.,  -3., -12.,  -7.,  -1.,
        -11., -12., -13.,   0.,  -3.]))
 
-target_movies = target_info(933)
-print target_movies
+watched_movies = target_info(933)
+print 'Target Movies:', watched_movies
 
 #similar_users = find_similar(target_prefs, user_prefs)
 
@@ -117,7 +135,7 @@ test_sim = np.array([(933, 0.0), (21, 1.0), (682, 1.7320500000000001), (207, 2.4
                      (378, 10.63015), (630, 10.63015), (634, 10.63015), (805, 10.63015), (885, 10.63015), (920, 10.63015), (183, 10.67708), (289, 10.67708), (921, 10.67708), (925, 10.67708), (35, 10.72381), (133, 10.72381), (418, 10.72381), (570, 10.72381), (860, 10.72381), (461, 10.77033), (505, 10.77033), (614, 10.77033), (839, 10.77033), (869, 10.77033), (61, 10.816649999999999), (238, 10.816649999999999), (792, 10.816649999999999), (172, 10.862780000000001), (205, 10.862780000000001), (382, 10.862780000000001), (726, 10.862780000000001), (873, 10.862780000000001), (914, 10.862780000000001), (27, 10.908709999999999), (81, 10.908709999999999), (199, 10.908709999999999), (346, 10.908709999999999),
                      (669, 10.908709999999999), (760, 10.908709999999999), (820, 10.908709999999999), (863, 10.908709999999999), (905, 10.908709999999999), (124, 10.95445), (305, 10.95445), (525, 10.95445), (872, 10.95445), (32, 11.0), (159, 11.0), (290, 11.0), (594, 11.0), (635, 11.0), (714, 11.0), (741, 11.0), (910, 11.0), (281, 11.045360000000001), (304, 11.045360000000001)])
 
-recommended_movies = find_recommendations(test_sim, target_prefs)
+recommended_movies = find_recommendations(test_sim, target_prefs, watched_movies=watched_movies)
 
 print recommended_movies
 
