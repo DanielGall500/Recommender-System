@@ -1,7 +1,6 @@
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import csv
+import sys
 import collections
 import operator
 
@@ -105,7 +104,8 @@ def find_recommendations(sim_users, target_user, watched_movies):
     highly_recommended = [x for x in sorted(rcmnd_count.items(), \
                    key=operator.itemgetter(1))[::-1] if x[1] != 0]
 
-    return highly_recommended
+    cutoff = int(len(highly_recommended) * 0.10) + 1
+    return highly_recommended[:cutoff]
 
 def target_info(user_id):
     rated_movies = [x for x in ratings_data[ratings_data['user_id'] == user_id]['item_id']]
@@ -140,18 +140,18 @@ recommended_movies = find_recommendations(test_sim, target_prefs, watched_movies
 print recommended_movies
 
 
-"""
-from sklearn.decomposition import PCA
-from sklearn.cluster import KMeans
+sys.path.append("C:/Users/dano/Desktop/Theory of Everything/IMDBPy")
 
-pca = PCA().fit_transform(ratings_data)
+from imdb import IMDb
 
-clstr = KMeans(n_clusters=(12), max_iter=300, random_state=42)
+md = IMDb()
 
-clstr.fit(pca)
-"""
+rec_mov = movies_data[movies_data['movie_id'] == \
+((recommended_movies[0])[0])]['movie_title'].iloc[0]
 
+print 'Rec Mov:', rec_mov
 
+print md.search_movie(rec_mov)
 
 
 
