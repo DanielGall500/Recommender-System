@@ -1,5 +1,8 @@
 import numpy as np
 import pandas as pd
+from Tkinter import *
+from PIL import Image, ImageTk
+import django
 import sys
 import collections
 import operator
@@ -119,7 +122,6 @@ target_prefs = np.array(([ -7.,  -8., -41.,  -4.,  -8.,  -1.,   0.,  -3., -12., 
        -11., -12., -13.,   0.,  -3.]))
 
 watched_movies = target_info(933)
-print 'Target Movies:', watched_movies
 
 #similar_users = find_similar(target_prefs, user_prefs)
 
@@ -139,7 +141,6 @@ recommended_movies = find_recommendations(test_sim, target_prefs, watched_movies
 
 print recommended_movies
 
-
 sys.path.append("C:/Users/dano/Desktop/Theory of Everything/IMDBPy")
 
 from imdb import IMDb
@@ -152,6 +153,19 @@ rec_mov = movies_data[movies_data['movie_id'] == \
 print 'Rec Mov:', rec_mov
 
 print md.search_movie(rec_mov)
+
+window = Tk()
+
+window.title("Recommendation System")
+window.geometry("1000x500")
+
+app = Frame(window)
+app.grid()
+
+button = Button(master=app, text=rec_mov)
+button.grid()
+
+window.mainloop()
 
 
 
