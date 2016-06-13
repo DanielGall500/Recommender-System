@@ -1,11 +1,17 @@
+import PIL.Image #was acting weird so had to import like this
+from PIL import ImageTk
+from StringIO import StringIO
 import numpy as np
 import pandas as pd
 from Tkinter import *
-from PIL import Image, ImageTk
 import django
 import sys
 import collections
 import operator
+import requests
+import urllib
+import base64
+import io
 
 rating_file = "C:\Users\dano\Dropbox\Datasets\ml-100k\u.csv"
 movieinfo_file = "C:\Users\dano\Dropbox\Datasets\ml-100k\u_item.csv"
@@ -145,14 +151,22 @@ sys.path.append("C:/Users/dano/Desktop/Theory of Everything/IMDBPy")
 
 from imdb import IMDb
 
-md = IMDb()
+mov_access = IMDb()
 
 rec_mov = movies_data[movies_data['movie_id'] == \
-((recommended_movies[0])[0])]['movie_title'].iloc[0]
+((recommended_movies[0])[1])]['movie_title'].iloc[0]
 
 print 'Rec Mov:', rec_mov
 
-print md.search_movie(rec_mov)
+mov_id = mov_access.search_movie(rec_mov)[0].movieID
+
+movie = mov_access.get_movie(mov_id)
+
+mov_img_url = movie['cover url']
+
+mov_img_url = urllib.urlopen(mov_img_url)
+img = io.BytesIO(mov_img_url.read())
+movie_img = PIL.Image.open(img)
 
 window = Tk()
 
@@ -162,10 +176,47 @@ window.geometry("1000x500")
 app = Frame(window)
 app.grid()
 
+converted_img = ImageTk.PhotoImage(movie_img)
+movie_view = Label(master=app, image=converted_img)
+movie_view.grid()
+
 button = Button(master=app, text=rec_mov)
 button.grid()
 
 window.mainloop()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
