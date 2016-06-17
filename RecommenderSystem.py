@@ -3,7 +3,12 @@ from PIL import ImageTk
 from StringIO import StringIO
 import numpy as np
 import pandas as pd
+
+
 from Tkinter import *
+from ttk import *
+
+
 import django
 import sys
 import collections
@@ -12,6 +17,7 @@ import requests
 import urllib
 import base64
 import io
+import web
 
 rating_file = "C:\Users\dano\Dropbox\Datasets\ml-100k\u.csv"
 movieinfo_file = "C:\Users\dano\Dropbox\Datasets\ml-100k\u_item.csv"
@@ -153,20 +159,19 @@ from imdb import IMDb
 
 mov_access = IMDb()
 
-rec_mov = movies_data[movies_data['movie_id'] == \
-((recommended_movies[0])[1])]['movie_title'].iloc[0]
+#final_recommends = [x for idx, x in enumerate(movies_data[movies_data['movie_id'] == \
+#((recommended_movies[0])[0])]['movie_title'].iloc[0])]
 
-print 'Rec Mov:', rec_mov
+final_recommends = []
 
-mov_id = mov_access.search_movie(rec_mov)[0].movieID
+for i in range(len(recommended_movies)):
 
-movie = mov_access.get_movie(mov_id)
+    r = movies_data[movies_data['movie_id'] == \
+    ((recommended_movies[i])[0])]['movie_title'].iloc[0]
 
-mov_img_url = movie['cover url']
+    final_recommends.append(r)
 
-mov_img_url = urllib.urlopen(mov_img_url)
-img = io.BytesIO(mov_img_url.read())
-movie_img = PIL.Image.open(img)
+print 'Rec Mov:', final_recommends
 
 window = Tk()
 
@@ -176,17 +181,40 @@ window.geometry("1000x500")
 app = Frame(window)
 app.grid()
 
-converted_img = ImageTk.PhotoImage(movie_img)
-movie_view = Label(master=app, image=converted_img)
-movie_view.grid()
 
-button = Button(master=app, text=rec_mov)
-button.grid()
+row = 0
+column = 0
+max_columns = 5
+images = []
+
+for idx, rec in enumerate(final_recommends[0:10]):
+
+    mov_id = mov_access.search_movie(rec)[0].movieID
+    movie = mov_access.get_movie(mov_id)
+    mov_img_url = movie['cover url']
+
+
+    mov_img_url = urllib.urlopen(mov_img_url)
+    img = io.BytesIO(mov_img_url.read())
+    movie_img = PIL.Image.open(img)
+
+    converted_img = ImageTk.PhotoImage(movie_img)
+
+    images.append(converted_img)
+
+    movie_view = Label(master=app, image=images[idx])
+    movie_view.grid(row=row, column=column)
+
+    button = Button(master=app, text=rec)
+    button.grid(row=row, column=column)
+
+    if column == max_columns:
+        row += 1
+        column = 0
+    else:
+        column += 1
 
 window.mainloop()
-
-
-
 
 
 
