@@ -3,12 +3,9 @@ from PIL import ImageTk
 from StringIO import StringIO
 import numpy as np
 import pandas as pd
-
-
+import matplotlib.pyplot as plt
 from Tkinter import *
 from ttk import *
-
-
 import django
 import sys
 import collections
@@ -18,6 +15,9 @@ import urllib
 import base64
 import io
 import web
+
+sys.path.append("C:/Users/dano/Desktop/Theory of Everything/IMDBPy")
+from imdb import IMDb
 
 rating_file = "C:\Users\dano\Dropbox\Datasets\ml-100k\u.csv"
 movieinfo_file = "C:\Users\dano\Dropbox\Datasets\ml-100k\u_item.csv"
@@ -34,7 +34,7 @@ movie_samples, movie_features = movies_data.shape
 
 num_categories = 16
 
-def ratings_set(users):
+def ratings_set(users): #gets the set of ratings and movie for each user
     user_info = {}
 
     for idx, user in users.iterrows():
@@ -48,6 +48,9 @@ def ratings_set(users):
             user_info[user_id] = [[movie_id, rating]]
 
     return user_info
+
+def normalize_user_prefs(user_prefs): #normalize the user preferences because of different movie rating sizes
+    return [x / sum(user_prefs) for x in user_prefs]
 
 def preference_set(usr_ratings, movies): #finds the category preferences of each user
     user_prefs = {}
@@ -71,6 +74,9 @@ def preference_set(usr_ratings, movies): #finds the category preferences of each
             else:
                 user_prefs[user] -= categ_prefs
 
+        user_prefs[user] = normalize_user_prefs(user_prefs[user])
+
+
     return user_prefs
 
 def find_similar(target_prefs, prefs_collection): #finds the similarity between users
@@ -86,7 +92,7 @@ def find_similar(target_prefs, prefs_collection): #finds the similarity between 
 
     return ordered_dict[:cut_off]
 
-def find_recommendations(sim_users, target_user, watched_movies):
+def find_recommendations(sim_users, target_user, watched_movies): #finds the recommendations for target user based on similar users
     rcmnd = {}
     rcmnd_count = {}
 
@@ -122,20 +128,23 @@ def find_recommendations(sim_users, target_user, watched_movies):
     cutoff = int(len(highly_recommended) * 0.10) + 1
     return highly_recommended[:cutoff]
 
-def target_info(user_id):
+def movies_watched(user_id):
     rated_movies = [x for x in ratings_data[ratings_data['user_id'] == user_id]['item_id']]
     return rated_movies
 
-#user_ratings = ratings_set(ratings_data)
+user_ratings = ratings_set(ratings_data)
 
-#user_prefs = preference_set(user_ratings, movies_data)
+user_prefs = preference_set(user_ratings, movies_data)
+print preference_set
 
 target_prefs = np.array(([ -7.,  -8., -41.,  -4.,  -8.,  -1.,   0.,  -3., -12.,  -7.,  -1.,
        -11., -12., -13.,   0.,  -3.]))
 
-watched_movies = target_info(933)
+norm_target_prefs = normalize_user_prefs(target_prefs)
 
-#similar_users = find_similar(target_prefs, user_prefs)
+watched_movies = movies_watched(933)
+
+similar_users = find_similar(target_prefs, user_prefs)
 
 test_sim = np.array([(933, 0.0), (21, 1.0), (682, 1.7320500000000001), (207, 2.4494899999999999), (13, 3.8729800000000001), (699, 3.8729800000000001), (116, 4.1231099999999996), (222, 4.1231099999999996), (790, 4.3589000000000002),
                      (454, 4.5825800000000001), (417, 4.6904199999999996), (262, 4.7958299999999996), (254, 4.8989799999999999), (795, 5.0), (275, 5.2915000000000001), (104, 5.4772299999999996), (269, 5.4772299999999996), (868, 5.91608),
@@ -151,17 +160,7 @@ test_sim = np.array([(933, 0.0), (21, 1.0), (682, 1.7320500000000001), (207, 2.4
 
 recommended_movies = find_recommendations(test_sim, target_prefs, watched_movies=watched_movies)
 
-print recommended_movies
-
-sys.path.append("C:/Users/dano/Desktop/Theory of Everything/IMDBPy")
-
-from imdb import IMDb
-
 mov_access = IMDb()
-
-#final_recommends = [x for idx, x in enumerate(movies_data[movies_data['movie_id'] == \
-#((recommended_movies[0])[0])]['movie_title'].iloc[0])]
-
 final_recommends = []
 
 for i in range(len(recommended_movies)):
